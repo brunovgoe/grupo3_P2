@@ -1,0 +1,19 @@
+<!-- cadastro_app/templates/cadastro_app/cadastrar_instituicao.html -->
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Cadastrar Instituição</title>
+</head>
+<body>
+    <h1>Cadastro de Instituição</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Cadastrar</button>
+    </form>
+    <br>
+    <a href="{% url 'cadastrar_aluno' %}">Cadastrar Aluno</a> | 
+    <a href="{% url 'cadastrar_professor' %}">Cadastrar Professor</a>
+</body>
+</html>
