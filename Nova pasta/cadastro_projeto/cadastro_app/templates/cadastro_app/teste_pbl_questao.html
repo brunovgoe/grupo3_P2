@@ -4,65 +4,135 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Teste PBL - Pergunta {{ questao_num }}</title>
+    <!-- Mantive o Bootstrap caso seja necessário para outros estilos -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Fonte 'Montserrat' do Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
     <style>
+        /* Reset básico */
+        * {
+            box-sizing: border-box;
+        }
         body {
             font-family: 'Roboto', sans-serif;
-            background-color: #f0f2f5;
+            /* Removi a cor de fundo estática e adicionei um gradiente inicial */
+            background: radial-gradient(at center, #f5f7fa, #e2e8f0);
+            transition: background 0.5s;
             padding-top: 50px;
+            overflow-x: hidden;
         }
         .container {
             max-width: 800px;
-            background: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            background: #ffffff;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            margin: 0 auto;
         }
         .progress {
-            height: 10px;
-            border-radius: 5px;
-            margin-bottom: 20px;
-            background-color: #e0e0e0;
+            height: 12px;
+            border-radius: 6px;
+            margin-bottom: 30px;
+            background-color: #dfe3e8;
+            overflow: hidden;
         }
         .progress-bar {
-            background-color: #007bff;
+            background-color: #1a73e8;
+            height: 100%;
+            width: {% widthratio questao_num total_questoes 100 %}%;
         }
         .btn-group {
             display: flex;
-            justify-content: space-between;
-            margin-top: 20px;
-            gap: 400px;
+            justify-content: center;
+            margin-top: 30px;
+            gap: 300px;
         }
-        .btn-group .btn {
+        .btn-custom {
             border-radius: 50px;
-            padding: 8px 20px;
+            padding: 12px 24px;
             font-size: 1em;
             width: 150px;
+            border: none;
+            color: #ffffff;
+            transition: background-color 0.3s, color 0.3s;
+            text-align: center;
+        }
+        .btn-custom-primary {
+            background-color: #1a73e8;
+        }
+        .btn-custom-secondary {
+            background-color: #6c757d;
+        }
+        .btn-custom-success {
+            background-color: #28a745;
+        }
+        .btn-custom:hover {
+            opacity: 0.9;
+        }
+        .btn-custom:focus, .btn-custom:active {
+            outline: none;
+            box-shadow: none;
+        }
+        .form-group {
+            margin-top: 40px;
         }
         .form-check {
-            margin-bottom: 20px;
+            margin-bottom: 25px;
             display: flex;
             align-items: center;
+            padding: 15px 20px;
+            border: 1px solid #dfe3e8;
+            border-radius: 8px;
+            transition: background-color 0.3s, border-color 0.3s;
+            cursor: pointer;
+        }
+        .form-check:hover {
+            background-color: #f0f2f5;
+            border-color: #cfd3d8;
         }
         .form-check-input {
-            width: 25px;
-            height: 25px;
+            width: 22px;
+            height: 22px;
             margin-right: 10px;
-            border-radius: 5px;
+            border-radius: 50%;
             flex-shrink: 0;
+            cursor: pointer;
+            transform: translateX(3px); /* Move o botão de rádio 3px para a direita */
         }
+
         .form-check-label {
             flex: 1;
+            font-size: 1.1em;
+            margin: 0;
             margin-left: 10px;
+            cursor: pointer;
         }
         .back-to-menu {
             position: absolute;
             top: 20px;
             left: 20px;
             text-decoration: none;
-            color: #007bff;
+            color: #1a73e8;
             font-weight: bold;
+            transition: color 0.3s;
+            border-radius: 50px;
+            padding: 5px 10px;
+        }
+        .back-to-menu:hover {
+            color: #155ab6;
+            background-color: #e0e0e0;
+            text-decoration: none;
+        }
+        h2 {
+            margin-bottom: 30px;
+        }
+        p {
+            font-size: 1.2em;
+            margin-bottom: 20px;
+        }
+        /* Espaçador para alinhamento quando o botão "Voltar" não está presente */
+        .btn-group .spacer {
+            width: 150px;
         }
     </style>
 </head>
@@ -71,7 +141,7 @@
     <div class="container">
         <!-- Barra de progresso -->
         <div class="progress">
-            <div class="progress-bar" role="progressbar" aria-valuenow="{{ questao_num }}" aria-valuemin="1" aria-valuemax="{{ total_questoes }}" style="width: {{ questao_num|floatformat:0 }}0%;"></div>
+            <div class="progress-bar" role="progressbar"></div>
         </div>
 
         <h2>Questão {{ questao_num }}</h2>
@@ -81,32 +151,44 @@
             {% csrf_token %}
             <div class="form-group">
                 {% for opcao in questao.opcoes %}
-                <div class="form-check">
+                <label class="form-check" for="opcao{{ forloop.counter }}">
                     <input type="radio" class="form-check-input" name="resposta" id="opcao{{ forloop.counter }}" value="{{ opcao }}"
                            {% if resposta_selecionada == opcao %}checked{% endif %} required>
-                    <label class="form-check-label" for="opcao{{ forloop.counter }}">{{ opcao }}</label>
-                </div>
+                    <span class="form-check-label">{{ opcao }}</span>
+                </label>
                 {% endfor %}
             </div>
             <div class="btn-group">
                 {% if questao_num > 1 %}
                     <!-- Botão de voltar para a pergunta anterior -->
-                    <a href="{% url 'teste_pbl_questao' questao_num=questao_num|add:'-1' %}" class="btn btn-secondary" style="border-radius: 50px;">Voltar</a>
+                    <a href="{% url 'teste_pbl_questao' questao_num=questao_num|add:'-1' %}" class="btn-custom btn-custom-secondary">Voltar</a>
+                {% else %}
+                    <!-- Espaço reservado para alinhamento -->
+                    <div class="spacer"></div>
                 {% endif %}
-                
+
                 <!-- Verificar se é a última pergunta -->
                 {% if questao_num == total_questoes %}
                     <!-- Se for a última pergunta, mudar o texto do botão -->
-                    <button type="submit" class="btn btn-success" style="border-radius: 50px;">Enviar Respostas</button>
+                    <button type="submit" class="btn-custom btn-custom-success">Enviar Respostas</button>
                 {% else %}
                     <!-- Caso contrário, continuar para a próxima pergunta -->
-                    <button type="submit" class="btn btn-primary" style="border-radius: 50px;">Continuar</button>
+                    <button type="submit" class="btn-custom btn-custom-primary">Continuar</button>
                 {% endif %}
             </div>
         </form>
     </div>
 
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Script para o fundo interativo -->
+    <script>
+        document.addEventListener('mousemove', function(e) {
+            var width = window.innerWidth;
+            var height = window.innerHeight;
+            var xPos = e.clientX / width * 100;
+            var yPos = e.clientY / height * 100;
+
+            document.body.style.background = 'radial-gradient(at ' + xPos + '% ' + yPos + '%, #f5f7fa, #e2e8f0)';
+        });
+    </script>
 </body>
 </html>

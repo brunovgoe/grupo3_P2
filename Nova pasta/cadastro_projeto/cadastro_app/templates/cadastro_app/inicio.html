@@ -3,35 +3,96 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tela Inicial</title>
+    <title>Entre ou Registre-se</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
         body {
-            background-color: #f8f9fa;
-            font-family: Arial, sans-serif;
+            font-family: 'Roboto', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+            position: relative;
+        }
+        .background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(120deg, #89f7fe, #66a6ff);
+            z-index: -1;
+            overflow: hidden;
+        }
+        .background .circle {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            pointer-events: none;
+            animation: move 20s linear infinite;
+        }
+        @keyframes move {
+            0% {
+                transform: translateY(0) translateX(0);
+            }
+            50% {
+                transform: translateY(-100px) translateX(100px);
+            }
+            100% {
+                transform: translateY(0) translateX(0);
+            }
         }
         .container {
             max-width: 600px;
-            padding: 30px;
+            padding: 50px;
             background-color: #ffffff;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
-            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            border-radius: 20px;
+            text-align: center;
+            z-index: 1;
         }
         h1 {
-            font-weight: 300;
+            font-weight: 700;
             color: #343a40;
+            margin-bottom: 40px;
         }
         .btn-primary, .btn-success {
-            width: 150px;
-            font-weight: 500;
+            width: 200px;
+            font-weight: 600;
+            border-radius: 30px;
+            padding: 12px 25px;
+            margin: 15px;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
+        }
+        .btn-primary:hover {
+            background-color: #0069d9;
+            border-color: #0062cc;
+        }
+        .btn-success {
+            background-color: #28a745;
+            border-color: #28a745;
+        }
+        .btn-success:hover {
+            background-color: #218838;
+            border-color: #1e7e34;
         }
     </style>
 </head>
 <body>
-    <div class="container mt-5">
-        <h1 class="text-center">Bem-vindo à Aplicação de Cadastro</h1>
-        <div class="d-flex justify-content-center mt-4">
-            <a href="{% url 'login_aluno' %}" class="btn btn-primary mr-3">Fazer Login</a>
+    <div class="background">
+        <div class="circle" style="width: 200px; height: 200px; top: 20%; left: 10%;"></div>
+        <div class="circle" style="width: 300px; height: 300px; top: 60%; left: 70%;"></div>
+        <div class="circle" style="width: 150px; height: 150px; top: 40%; left: 40%;"></div>
+    </div>
+    <div class="container">
+        <h1>Entre ou Registre-se</h1>
+        <div class="d-flex flex-column align-items-center">
+            <a href="{% url 'login_aluno' %}" class="btn btn-primary">Fazer Login</a>
             <a href="{% url 'cadastrar_aluno' %}" class="btn btn-success">Fazer Cadastro</a>
         </div>
     </div>
