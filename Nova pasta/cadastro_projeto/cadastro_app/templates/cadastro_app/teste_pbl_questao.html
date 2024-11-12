@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -71,7 +71,7 @@
     <div class="container">
         <!-- Barra de progresso -->
         <div class="progress">
-            <div class="progress-bar" role="progressbar" aria-valuenow="{{ questao_num }}" aria-valuemin="1" aria-valuemax="10" style="width: {{ questao_num|floatformat:0 }}0%;"></div>
+            <div class="progress-bar" role="progressbar" aria-valuenow="{{ questao_num }}" aria-valuemin="1" aria-valuemax="{{ total_questoes }}" style="width: {{ questao_num|floatformat:0 }}0%;"></div>
         </div>
 
         <h2>Questão {{ questao_num }}</h2>
@@ -82,16 +82,26 @@
             <div class="form-group">
                 {% for opcao in questao.opcoes %}
                 <div class="form-check">
-                    <input type="radio" class="form-check-input" name="resposta" id="opcao{{ forloop.counter }}" value="{{ opcao }}" required>
+                    <input type="radio" class="form-check-input" name="resposta" id="opcao{{ forloop.counter }}" value="{{ opcao }}"
+                           {% if resposta_selecionada == opcao %}checked{% endif %} required>
                     <label class="form-check-label" for="opcao{{ forloop.counter }}">{{ opcao }}</label>
                 </div>
                 {% endfor %}
             </div>
             <div class="btn-group">
                 {% if questao_num > 1 %}
+                    <!-- Botão de voltar para a pergunta anterior -->
                     <a href="{% url 'teste_pbl_questao' questao_num=questao_num|add:'-1' %}" class="btn btn-secondary" style="border-radius: 50px;">Voltar</a>
                 {% endif %}
-                <button type="submit" class="btn btn-primary" style="border-radius: 50px;">Continuar</button>
+                
+                <!-- Verificar se é a última pergunta -->
+                {% if questao_num == total_questoes %}
+                    <!-- Se for a última pergunta, mudar o texto do botão -->
+                    <button type="submit" class="btn btn-success" style="border-radius: 50px;">Enviar Respostas</button>
+                {% else %}
+                    <!-- Caso contrário, continuar para a próxima pergunta -->
+                    <button type="submit" class="btn btn-primary" style="border-radius: 50px;">Continuar</button>
+                {% endif %}
             </div>
         </form>
     </div>

@@ -4,7 +4,7 @@ from .forms import AlunoForm, ProfessorForm, InstituicaoForm, UsuarioPersonaliza
 from django.http import JsonResponse, HttpResponseForbidden
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
-from .models import Aluno, Professor, Instituicao, Resposta
+from .models import Aluno, Professor, Instituicao, Resposta, QuestaoTeste
 
 
 def pagina_inicial(request):
@@ -200,24 +200,41 @@ def teste_pbl_questao(request, questao_num):
         }
     ]
 
-    if questao_num > len(questoes):
-        return redirect('home')  # Redireciona para a página inicial quando o questionário termina
+    total_questoes = len(questoes)
+
+    # Verifique se o número da questão não ultrapassa a quantidade de questões
+    if questao_num > total_questoes:
+        return redirect('resultado_teste')  # Redireciona para o resultado ao finalizar o questionário
 
     if request.method == 'POST':
-        # Salvar a resposta do usuário
-        resposta_texto = request.POST.get('resposta')
-        Resposta.objects.create(
-            texto=resposta_texto,
-            ordem=questao_num
-        )
-        # Redireciona para a próxima pergunta
-        return redirect('teste_pbl_questao', questao_num=questao_num + 1)
+        resposta = request.POST.get('resposta')
 
-    # Renderiza a questão atual
+        # Inicialize a sessão de respostas, se não existir
+        if 'respostas' not in request.session:
+            request.session['respostas'] = [None] * total_questoes
+
+        # Armazene a resposta da questão atual na sessão (indexando pela posição da questão)
+        request.session['respostas'][questao_num - 1] = resposta
+        request.session.modified = True  # Marca a sessão como modificada
+
+        # Redirecione para a próxima questão
+        if questao_num < total_questoes:
+            return redirect('teste_pbl_questao', questao_num=questao_num + 1)
+        else:
+            # Se for a última questão, redireciona para o resultado
+            return redirect('resultado_teste')
+
+    # Recupera a questão atual
     questao = questoes[questao_num - 1]
+
+    # Recupera a resposta previamente selecionada, se disponível
+    respostas = request.session.get('respostas', [None] * total_questoes)
+    resposta_selecionada = respostas[questao_num - 1] if respostas and len(respostas) >= questao_num else None
+
     context = {
         'questao': questao,
         'questao_num': questao_num,
-        'proxima_questao': questao_num + 1
+        'total_questoes': total_questoes,
+        'resposta_selecionada': resposta_selecionada
     }
     return render(request, 'cadastro_app/teste_pbl_questao.html', context)
