@@ -27,7 +27,9 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
-
+AUTH_USER_MODEL = 'cadastro_app.UsuarioPersonalizado'
+LOGIN_URL = 'login_aluno'
+LOGIN_REDIRECT_URL = 'home'
 
 
 # Application definition
@@ -55,7 +57,9 @@ MIDDLEWARE = [
 ROOT_URLCONF = 'cadastro_projeto.urls'
 
 # settings.py
-
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+]
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
