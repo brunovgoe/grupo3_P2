@@ -2,18 +2,61 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Entre ou Registre-se</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- Fonte 'Roboto' do Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <style>
+        /* Estilos Globais */
         body {
             font-family: 'Roboto', sans-serif;
+            margin: 0;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            position: relative;
+        }
+        /* Estilos do Header */
+        header {
+            width: 100%;
+            background-color: #ffffff;
+            padding: 10px 0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            z-index: 10;
+        }
+        header .navbar-brand {
+            font-weight: bold;
+            color: #007bff;
+        }
+        /* Estilos do Footer */
+        footer {
+            width: 100%;
+            background-color: rgba(248, 249, 250, 0.8);
+            color: #6c757d;
+            text-align: center;
+            padding: 8px 0;
+            z-index: 10;
+        }
+        footer p {
+            margin: 0;
+            font-size: 0.9em;
+        }
+        footer a {
+            color: #6c757d;
+            text-decoration: none;
+            margin: 0 5px;
+            font-size: 0.9em;
+        }
+        footer a:hover {
+            text-decoration: underline;
+        }
+        /* Estilos Específicos da Página */
+        .content {
+            flex: 1;
             display: flex;
             align-items: center;
             justify-content: center;
-            height: 100vh;
-            margin: 0;
-            overflow: hidden;
             position: relative;
         }
         .background {
@@ -44,7 +87,7 @@
                 transform: translateY(0) translateX(0);
             }
         }
-        .container {
+        .container-page {
             max-width: 600px;
             padding: 50px;
             background-color: #ffffff;
@@ -84,17 +127,39 @@
     </style>
 </head>
 <body>
-    <div class="background">
-        <div class="circle" style="width: 200px; height: 200px; top: 20%; left: 10%;"></div>
-        <div class="circle" style="width: 300px; height: 300px; top: 60%; left: 70%;"></div>
-        <div class="circle" style="width: 150px; height: 150px; top: 40%; left: 40%;"></div>
-    </div>
-    <div class="container">
-        <h1>Entre ou Registre-se</h1>
-        <div class="d-flex flex-column align-items-center">
-            <a href="{% url 'login_aluno' %}" class="btn btn-primary">Fazer Login</a>
-            <a href="{% url 'cadastrar_aluno' %}" class="btn btn-success">Fazer Cadastro</a>
+    <!-- Header -->
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-light">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="{% url 'home' %}">PBL Test</a>
+                <!-- Você pode adicionar mais itens de navegação aqui -->
+            </div>
+        </nav>
+    </header>
+
+    <!-- Conteúdo Principal -->
+    <div class="content">
+        <div class="background">
+            <div class="circle" style="width: 200px; height: 200px; top: 20%; left: 10%;"></div>
+            <div class="circle" style="width: 300px; height: 300px; top: 60%; left: 70%;"></div>
+            <div class="circle" style="width: 150px; height: 150px; top: 40%; left: 40%;"></div>
+        </div>
+        <div class="container-page">
+            <h1>Entre ou Registre-se</h1>
+            <div class="d-flex flex-column align-items-center">
+                <a href="{% url 'login_aluno' %}" class="btn btn-primary">Fazer Login</a>
+                <a href="{% url 'cadastrar_aluno' %}" class="btn btn-success">Fazer Cadastro</a>
+            </div>
         </div>
     </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2024 - PBL Test. Todos os direitos reservados.</p>
+    </footer>
+
+    <!-- Scripts JS -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

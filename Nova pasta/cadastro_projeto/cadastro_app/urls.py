@@ -13,21 +13,32 @@ urlpatterns = [
     
     # Rotas de cadastro e login de aluno
     path('cadastro/aluno/', views.cadastrar_aluno, name='cadastrar_aluno'),
-   path('login/aluno/', auth_views.LoginView.as_view(
+    path('login/aluno/', auth_views.LoginView.as_view(
         template_name='cadastro_app/login_aluno.html',
-        redirect_authenticated_user=True
+        redirect_authenticated_user=True,
+        next_page='home'  # Adicionado conforme sugestão
     ), name='login_aluno'),
 
     # Rotas de cadastro e login de professor
     path('cadastro/professor/', views.cadastrar_professor, name='cadastrar_professor'),
-    path('login/professor/', auth_views.LoginView.as_view(template_name='cadastro_app/login_professor.html', next_page='home'), name='login_professor'),
+    path('login/professor/', auth_views.LoginView.as_view(
+        template_name='cadastro_app/login_professor.html',
+        next_page='home'
+    ), name='login_professor'),
 
     # Rotas de cadastro e login de instituição
     path('cadastro/instituicao/', views.cadastrar_instituicao, name='cadastrar_instituicao'),
-    path('login/instituicao/', auth_views.LoginView.as_view(template_name='cadastro_app/login_instituicao.html', next_page='home'), name='login_instituicao'),
+    path('login/instituicao/', auth_views.LoginView.as_view(
+        template_name='cadastro_app/login_instituicao.html',
+        next_page='home'
+    ), name='login_instituicao'),
 
     # Rota de logout, aplicável a qualquer tipo de usuário
-    path('logout/', auth_views.LogoutView.as_view(template_name='cadastro_app/logout.html'), name='logout'),
+    path('logout/', auth_views.LogoutView.as_view(
+        template_name='cadastro_app/logout.html'
+    ), name='logout'),
     
     path('teste_pbl/questao/<int:questao_num>/', views.teste_pbl_questao, name='teste_pbl_questao'),
+    
+    path('resultado_teste/', views.resultado_teste, name='resultado_teste'),
 ]

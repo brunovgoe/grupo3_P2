@@ -1,15 +1,12 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from .forms import AlunoForm, ProfessorForm, InstituicaoForm, UsuarioPersonalizadoCreationForm
+from .forms import ProfessorForm, InstituicaoForm, UsuarioPersonalizadoCreationForm
 from django.http import JsonResponse, HttpResponseForbidden
-from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
-from .models import Aluno, Professor, Instituicao, Resposta, QuestaoTeste
-
+from .models import Resposta
 
 def pagina_inicial(request):
     return render(request, 'cadastro_app/inicio.html')
-
 
 # View para a página inicial
 @login_required
@@ -17,37 +14,19 @@ def home(request):
     resumo_lido = request.session.get('resumo_lido', False)
     return render(request, 'cadastro_app/home.html', {'resumo_lido': resumo_lido})
 
-
 # View para cadastrar aluno
 def cadastrar_aluno(request):
     if request.method == 'POST':
-        usuario_form = UsuarioPersonalizadoCreationForm(request.POST)
-        aluno_form = AlunoForm(request.POST)
-        
-        if usuario_form.is_valid() and aluno_form.is_valid():
-            # Primeiro, salva o formulário do usuário personalizado
-            usuario = usuario_form.save()
-
-            # Cria o aluno associado ao usuário
-            aluno = aluno_form.save(commit=False)
-            aluno.usuario = usuario
-            aluno.save()
-
-            # Mensagem de sucesso e redirecionamento para a página de login
+        form = UsuarioPersonalizadoCreationForm(request.POST)
+        if form.is_valid():
+            form.save()
             messages.success(request, 'Aluno cadastrado com sucesso!')
             return redirect('login_aluno')
         else:
-            # Se houver erros no formulário, mostrar mensagens de erro
             messages.error(request, 'Houve um erro no cadastro. Verifique as informações.')
     else:
-        usuario_form = UsuarioPersonalizadoCreationForm()
-        aluno_form = AlunoForm()
-
-    # Renderizar o template de cadastro com os dois formulários
-    return render(request, 'cadastro_app/cadastrar_aluno.html', {
-        'usuario_form': usuario_form,
-        'aluno_form': aluno_form
-    })
+        form = UsuarioPersonalizadoCreationForm()
+    return render(request, 'cadastro_app/cadastrar_aluno.html', {'form': form})
 
 # View para cadastrar professor
 def cadastrar_professor(request):
@@ -58,14 +37,21 @@ def cadastrar_professor(request):
             usuario = usuario_form.save(commit=False)
             usuario.is_active = False  # Definir como inativo até a verificação, se necessário
             usuario.save()
-            Professor.objects.create(usuario=usuario, departamento=professor_form.cleaned_data['departamento'])
+            Professor.objects.create(
+                usuario=usuario,
+                departamento=professor_form.cleaned_data['departamento']
+            )
             messages.success(request, 'Professor cadastrado com sucesso! Por favor, faça o login.')
             return redirect('login_professor')
+        else:
+            messages.error(request, 'Houve um erro no cadastro. Verifique as informações.')
     else:
         usuario_form = UsuarioPersonalizadoCreationForm()
         professor_form = ProfessorForm()
-    return render(request, 'cadastro_app/cadastrar_professor.html', {'usuario_form': usuario_form, 'professor_form': professor_form})
-
+    return render(request, 'cadastro_app/cadastrar_professor.html', {
+        'usuario_form': usuario_form,
+        'professor_form': professor_form
+    })
 
 # View para cadastrar instituição
 def cadastrar_instituicao(request):
@@ -76,19 +62,25 @@ def cadastrar_instituicao(request):
             usuario = usuario_form.save(commit=False)
             usuario.is_active = False  # Definir como inativo até a verificação, se necessário
             usuario.save()
-            Instituicao.objects.create(usuario=usuario, cnpj=instituicao_form.cleaned_data['cnpj'])
+            Instituicao.objects.create(
+                usuario=usuario,
+                cnpj=instituicao_form.cleaned_data['cnpj']
+            )
             messages.success(request, 'Instituição cadastrada com sucesso! Por favor, faça o login.')
             return redirect('login_instituicao')
+        else:
+            messages.error(request, 'Houve um erro no cadastro. Verifique as informações.')
     else:
         usuario_form = UsuarioPersonalizadoCreationForm()
         instituicao_form = InstituicaoForm()
-    return render(request, 'cadastro_app/cadastrar_instituicao.html', {'usuario_form': usuario_form, 'instituicao_form': instituicao_form})
-
+    return render(request, 'cadastro_app/cadastrar_instituicao.html', {
+        'usuario_form': usuario_form,
+        'instituicao_form': instituicao_form
+    })
 
 # View para a página de Resumo PBL
 def resumo_pbl(request):
     return render(request, 'cadastro_app/resumo_pbl.html')
-
 
 def confirmar_leitura(request):
     if request.method == 'POST':
@@ -96,7 +88,6 @@ def confirmar_leitura(request):
         request.session.modified = True
         return JsonResponse({'success': True})
     return JsonResponse({'success': False}, status=400)
-
 
 @login_required
 def teste_pbl(request):
@@ -209,27 +200,37 @@ def teste_pbl_questao(request, questao_num):
     if request.method == 'POST':
         resposta = request.POST.get('resposta')
 
-        # Inicialize a sessão de respostas, se não existir
-        if 'respostas' not in request.session:
-            request.session['respostas'] = [None] * total_questoes
+        # Recupera a questão atual para obter o texto e a ordem
+        questao = questoes[questao_num - 1]
+        texto = questao['pergunta']
+        ordem = questao_num
 
-        # Armazene a resposta da questão atual na sessão (indexando pela posição da questão)
-        request.session['respostas'][questao_num - 1] = resposta
-        request.session.modified = True  # Marca a sessão como modificada
+        # Salvar a resposta no banco de dados
+        Resposta.objects.update_or_create(
+            usuario=request.user,
+            questao_num=questao_num,
+            defaults={
+                'resposta': resposta,
+                'texto': texto,
+                'ordem': ordem,
+            }
+        )
 
-        # Redirecione para a próxima questão
+        # Redireciona para a próxima questão ou resultado
         if questao_num < total_questoes:
             return redirect('teste_pbl_questao', questao_num=questao_num + 1)
         else:
-            # Se for a última questão, redireciona para o resultado
             return redirect('resultado_teste')
 
     # Recupera a questão atual
     questao = questoes[questao_num - 1]
 
     # Recupera a resposta previamente selecionada, se disponível
-    respostas = request.session.get('respostas', [None] * total_questoes)
-    resposta_selecionada = respostas[questao_num - 1] if respostas and len(respostas) >= questao_num else None
+    try:
+        resposta_usuario = Resposta.objects.get(usuario=request.user, questao_num=questao_num)
+        resposta_selecionada = resposta_usuario.resposta
+    except Resposta.DoesNotExist:
+        resposta_selecionada = None
 
     context = {
         'questao': questao,
@@ -238,3 +239,33 @@ def teste_pbl_questao(request, questao_num):
         'resposta_selecionada': resposta_selecionada
     }
     return render(request, 'cadastro_app/teste_pbl_questao.html', context)
+
+@login_required
+def resultado_teste(request):
+    # Obter as respostas do usuário do banco de dados
+    respostas_usuario = Resposta.objects.filter(usuario=request.user).order_by('questao_num')
+
+    if not respostas_usuario.exists():
+        # Se não houver respostas, redirecione para a primeira questão
+        return redirect('teste_pbl_questao', questao_num=1)
+
+    # Processar as respostas conforme necessário
+    respostas = [resp.resposta for resp in respostas_usuario]
+
+    # Exemplo de contagem de respostas
+    contagem_opcoes = {}
+    for resposta in respostas:
+        if resposta in contagem_opcoes:
+            contagem_opcoes[resposta] += 1
+        else:
+            contagem_opcoes[resposta] = 1
+
+    context = {
+        'respostas': respostas_usuario,
+        'contagem_opcoes': contagem_opcoes,
+    }
+
+    # Opcional: Limpar as respostas do usuário após o processamento
+    # respostas_usuario.delete()
+
+    return render(request, 'cadastro_app/resultado_teste.html', context)

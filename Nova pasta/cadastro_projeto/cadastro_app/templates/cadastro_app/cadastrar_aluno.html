@@ -8,38 +8,91 @@
     <style>
         body {
             background-color: #f8f9fa;
-            font-family: Arial, sans-serif;
         }
         .container {
             max-width: 600px;
-            padding: 30px;
-            background-color: #ffffff;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
-            border-radius: 10px;
             margin-top: 50px;
         }
         h1 {
-            font-weight: 300;
-            color: #343a40;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        h3 {
+            margin-top: 30px;
             margin-bottom: 20px;
+            border-bottom: 1px solid #dee2e6;
+            padding-bottom: 10px;
+        }
+        .btn-container {
+            margin-top: 20px;
         }
         .btn {
+            width: 100%;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
             font-weight: 500;
+        }
+        .form-control {
+            border-radius: 5px;
         }
     </style>
 </head>
 <body>
-    <div class="container">
+    <div class="container bg-white p-4 shadow-sm rounded">
         <h1>Cadastro de Aluno</h1>
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}" role="alert">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
         <form method="post">
             {% csrf_token %}
             <h3>Informações do Usuário</h3>
-            {{ usuario_form.as_p }}
-            
-            <h3>Informações do Aluno</h3>
-            {{ aluno_form.as_p }}
-            
-            <button type="submit" class="btn btn-success">Cadastrar</button>
+            <!-- Linha para Username e Email -->
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    {{ form.username.label_tag }}
+                    {{ form.username }}
+                </div>
+                <div class="form-group col-md-6">
+                    {{ form.email.label_tag }}
+                    {{ form.email }}
+                </div>
+            </div>
+            <!-- Campo Nome Completo -->
+            <div class="form-group">
+                {{ form.nome_completo.label_tag }}
+                {{ form.nome_completo }}
+            </div>
+            <!-- Campo Curso -->
+            <div class="form-group">
+                {{ form.curso.label_tag }}
+                {{ form.curso }}
+            </div>
+            <!-- Campo Senha -->
+            <div class="form-group">
+                {{ form.password1.label_tag }}
+                {{ form.password1 }}
+            </div>
+            <!-- Campo Confirmação de Senha -->
+            <div class="form-group">
+                {{ form.password2.label_tag }}
+                {{ form.password2 }}
+            </div>
+            <!-- Botões lado a lado -->
+            <div class="form-row btn-container">
+                <div class="col-md-6">
+                    <a href="/" class="btn btn-secondary">Voltar</a>
+                </div>
+                <div class="col-md-6">
+                    <button type="submit" class="btn btn-success">Cadastrar</button>
+                </div>
+            </div>
         </form>
     </div>
 </body>

@@ -1,22 +1,25 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.conf import settings
 
 class UsuarioPersonalizado(AbstractUser):
     nome_completo = models.CharField(max_length=150)
     email = models.EmailField(unique=True)
-
+    
+    CURSO_CHOICES = [
+        ('design', 'Design'),
+        ('ciencia_computacao', 'Ciência da Computação'),
+        ('sistemas_informacao', 'Sistemas de Informação'),
+        ('ads', 'Análise e Desenvolvimento de Software (ADS)'),
+        ('gestao_ti', 'Gestão de Tecnologia da Informação'),
+    ]
+    curso = models.CharField(max_length=50, choices=CURSO_CHOICES)
+    
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username', 'nome_completo']
-
+    
     def __str__(self):
         return self.username
-
-class Aluno(models.Model):
-    usuario = models.OneToOneField(UsuarioPersonalizado, on_delete=models.CASCADE)
-    curso = models.CharField(max_length=100)  # Exemplo: adicione um campo específico de Aluno
-
-    def __str__(self):
-        return self.usuario.nome_completo
 
 class Professor(models.Model):
     usuario = models.OneToOneField(UsuarioPersonalizado, on_delete=models.CASCADE)
@@ -33,12 +36,15 @@ class Instituicao(models.Model):
         return self.usuario.nome_completo
 
 class Resposta(models.Model):
+    usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    questao_num = models.PositiveIntegerField()
+    resposta = models.CharField(max_length=255)
     texto = models.TextField()
-    ordem = models.PositiveIntegerField()
+    ordem = models.IntegerField()
 
     def __str__(self):
-        return f"Resposta {self.ordem}: {self.texto[:50]}"
-
+        return f"Usuário: {self.usuario}, Questão: {self.questao_num}, Resposta: {self.resposta}"
+    
 class QuestaoTeste(models.Model):
     enunciado = models.TextField()
     resposta_correta = models.ForeignKey(Resposta, on_delete=models.CASCADE, related_name='questoes')
