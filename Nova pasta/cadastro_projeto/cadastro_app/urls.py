@@ -41,4 +41,5 @@ urlpatterns = [
     path('teste_pbl/questao/<int:questao_num>/', views.teste_pbl_questao, name='teste_pbl_questao'),
     
     path('resultado_teste/', views.resultado_teste, name='resultado_teste'),
+    path('escolha_perfil/', views.escolha_perfil, name='escolha_perfil'),
 ]

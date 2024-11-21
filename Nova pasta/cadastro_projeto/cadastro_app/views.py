@@ -269,3 +269,6 @@ def resultado_teste(request):
     # respostas_usuario.delete()
 
     return render(request, 'cadastro_app/resultado_teste.html', context)
+
+def escolha_perfil(request):
+    return render(request, 'cadastro_app/aluno_professor.html')
