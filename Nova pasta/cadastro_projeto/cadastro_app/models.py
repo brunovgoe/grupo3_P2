@@ -23,14 +23,14 @@ class UsuarioPersonalizado(AbstractUser):
 
 class Professor(models.Model):
     usuario = models.OneToOneField(UsuarioPersonalizado, on_delete=models.CASCADE)
-    departamento = models.CharField(max_length=100)  # Exemplo: adicione um campo específico de Professor
+    departamento = models.CharField(max_length=100)  
 
     def __str__(self):
         return self.usuario.nome_completo
 
 class Instituicao(models.Model):
     usuario = models.OneToOneField(UsuarioPersonalizado, on_delete=models.CASCADE)
-    cnpj = models.CharField(max_length=18)  # Exemplo: adicione um campo específico de Instituição
+    cnpj = models.CharField(max_length=18)  
 
     def __str__(self):
         return self.usuario.nome_completo

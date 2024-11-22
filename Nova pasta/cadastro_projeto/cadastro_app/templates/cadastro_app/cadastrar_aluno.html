@@ -53,7 +53,7 @@
         <form method="post">
             {% csrf_token %}
             <h3>Informações do Usuário</h3>
-            <!-- Linha para Username e Email -->
+            
             <div class="form-row">
                 <div class="form-group col-md-6">
                     {{ form.username.label_tag }}
@@ -64,27 +64,27 @@
                     {{ form.email }}
                 </div>
             </div>
-            <!-- Campo Nome Completo -->
+            
             <div class="form-group">
                 {{ form.nome_completo.label_tag }}
                 {{ form.nome_completo }}
             </div>
-            <!-- Campo Curso -->
+            
             <div class="form-group">
                 {{ form.curso.label_tag }}
                 {{ form.curso }}
             </div>
-            <!-- Campo Senha -->
+            
             <div class="form-group">
                 {{ form.password1.label_tag }}
                 {{ form.password1 }}
             </div>
-            <!-- Campo Confirmação de Senha -->
+            
             <div class="form-group">
                 {{ form.password2.label_tag }}
                 {{ form.password2 }}
             </div>
-            <!-- Botões lado a lado -->
+            
             <div class="form-row btn-container">
                 <div class="col-md-6">
                     <a href="/" class="btn btn-secondary">Voltar</a>

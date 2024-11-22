@@ -99,7 +99,7 @@
     <script>
         document.getElementById('btn_confirmar_leitura').addEventListener('click', function(event) {
             if (document.getElementById('confirmacao_leitura').checked) {
-                // Faz a requisição para o backend para confirmar a leitura
+                
                 fetch("{% url 'confirmar_leitura' %}", {
                     method: "POST",
                     headers: {
@@ -109,7 +109,7 @@
                     body: JSON.stringify({ confirmacao_leitura: true })
                 }).then(response => {
                     if (response.ok) {
-                        // Redireciona o usuário à página inicial após a confirmação da leitura
+                        
                         window.location.href = "{% url 'home' %}";
                     } else {
                         alert("Erro ao confirmar leitura. Tente novamente.");

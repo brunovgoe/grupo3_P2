@@ -4,18 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Teste PBL - Pergunta {{ questao_num }}</title>
-    <!-- Mantive o Bootstrap caso seja necessário para outros estilos -->
+    
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <!-- Fonte 'Montserrat' do Google Fonts -->
+    
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        /* Reset básico */
+        
         * {
             box-sizing: border-box;
         }
         body {
             font-family: 'Roboto', sans-serif;
-            /* Removi a cor de fundo estática e adicionei um gradiente inicial */
+            
             background: radial-gradient(at center, #f5f7fa, #e2e8f0);
             transition: background 0.5s;
             padding-top: 50px;
@@ -97,7 +97,7 @@
             border-radius: 50%;
             flex-shrink: 0;
             cursor: pointer;
-            transform: translateX(3px); /* Move o botão de rádio 3px para a direita */
+            transform: translateX(3px); 
         }
 
         .form-check-label {
@@ -130,7 +130,7 @@
             font-size: 1.2em;
             margin-bottom: 20px;
         }
-        /* Espaçador para alinhamento quando o botão "Voltar" não está presente */
+        
         .btn-group .spacer {
             width: 150px;
         }
@@ -139,7 +139,7 @@
 <body>
     <a href="{% url 'home' %}" class="back-to-menu">← Voltar ao Menu Principal</a>
     <div class="container">
-        <!-- Barra de progresso -->
+        
         <div class="progress">
             <div class="progress-bar" role="progressbar"></div>
         </div>
@@ -160,26 +160,26 @@
             </div>
             <div class="btn-group">
                 {% if questao_num > 1 %}
-                    <!-- Botão de voltar para a pergunta anterior -->
+                    
                     <a href="{% url 'teste_pbl_questao' questao_num=questao_num|add:'-1' %}" class="btn-custom btn-custom-secondary">Voltar</a>
                 {% else %}
-                    <!-- Espaço reservado para alinhamento -->
+                    
                     <div class="spacer"></div>
                 {% endif %}
 
-                <!-- Verificar se é a última pergunta -->
+                
                 {% if questao_num == total_questoes %}
-                    <!-- Se for a última pergunta, mudar o texto do botão -->
+                    
                     <button type="submit" class="btn-custom btn-custom-success">Enviar Respostas</button>
                 {% else %}
-                    <!-- Caso contrário, continuar para a próxima pergunta -->
+                    
                     <button type="submit" class="btn-custom btn-custom-primary">Continuar</button>
                 {% endif %}
             </div>
         </form>
     </div>
 
-    <!-- Script para o fundo interativo -->
+    
     <script>
         document.addEventListener('mousemove', function(e) {
             var width = window.innerWidth;
