@@ -1,50 +1,19 @@
+# cadastro_app/urls.py
+
 from django.urls import path
 from . import views
-from django.contrib.auth import views as auth_views
 
 urlpatterns = [
-    
-    path('', views.pagina_inicial, name='pagina_inicial'),
-    path('home/', views.home, name='home'),
-
-    path('inicio_aluno/', views.inicio_aluno, name='inicio_aluno'),
-
-    path('inicio_professor/', views.inicio_professor, name='inicio_professor'),
-    
+    path('', views.escolha_perfil, name='pagina_inicial'),  # Página inicial (Escolha de Perfil)
+    path('home/', views.home, name='home'),  # Página inicial do aluno após login
+    path('inicio_professor/', views.inicio_professor, name='inicio_professor'),  # Página inicial do professor
+    path('cadastrar_aluno/', views.cadastrar_aluno, name='cadastrar_aluno'),
+    path('cadastrar_professor/', views.cadastrar_professor, name='cadastrar_professor'),
+    path('login_aluno/', views.login_aluno, name='login_aluno'),
+    path('login_professor/', views.login_professor, name='login_professor'),
     path('resumo_pbl/', views.resumo_pbl, name='resumo_pbl'),
     path('confirmar_leitura/', views.confirmar_leitura, name='confirmar_leitura'),
-
-    # Rotas de cadastro e login de aluno
-    path('cadastro/aluno/', views.cadastrar_aluno, name='cadastrar_aluno'),
-    path('login/aluno/', auth_views.LoginView.as_view(
-        template_name='cadastro_app/login_aluno.html',
-        redirect_authenticated_user=True,
-        next_page='home'  
-    ), name='login_aluno'),
-
-    path('cadastro/professor/', views.cadastrar_professor,
-         name='cadastrar_professor'),
-    path('login/professor/', auth_views.LoginView.as_view(
-        template_name='cadastro_app/login_professor.html',
-        next_page='home'
-    ), name='login_professor'),
-
-    
-    path('cadastro/instituicao/', views.cadastrar_instituicao,
-         name='cadastrar_instituicao'),
-    path('login/instituicao/', auth_views.LoginView.as_view(
-        template_name='cadastro_app/login_instituicao.html',
-        next_page='home'
-    ), name='login_instituicao'),
-
-    # Rota de logout, aplicável a qualquer tipo de usuário
-    path('logout/', auth_views.LogoutView.as_view(
-        template_name='cadastro_app/logout.html'
-    ), name='logout'),
-
-    path('teste_pbl/questao/<int:questao_num>/',
-         views.teste_pbl_questao, name='teste_pbl_questao'),
-
+    path('teste_pbl/', views.teste_pbl, name='teste_pbl'),
+    path('teste_pbl/questao/<int:questao_num>/', views.teste_pbl_questao, name='teste_pbl_questao'),
     path('resultado_teste/', views.resultado_teste, name='resultado_teste'),
-    path('escolha_perfil/', views.escolha_perfil, name='escolha_perfil'),
 ]

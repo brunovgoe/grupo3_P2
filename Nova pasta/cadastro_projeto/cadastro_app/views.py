@@ -1,14 +1,21 @@
+# cadastro_app/views.py
+
+from .forms import ProfessorRegistrationForm, AlunoRegistrationForm 
+from django.contrib.auth import authenticate, login
+from django.contrib.auth.forms import AuthenticationForm
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from .forms import ProfessorForm, InstituicaoForm, UsuarioPersonalizadoCreationForm
-from django.http import JsonResponse, HttpResponseForbidden
 from django.contrib.auth.decorators import login_required
-from .models import Resposta
+from django.http import JsonResponse, HttpResponseForbidden
+from .models import Resposta, Professor, Aluno, UsuarioPersonalizado
+from django.contrib.auth import get_user_model
+from django import forms
 
+class EmailAuthenticationForm(AuthenticationForm):
+    username = forms.EmailField(label='Email', widget=forms.EmailInput(attrs={'autofocus': True}))
 
 def pagina_inicial(request):
-    return render(request, 'cadastro_app/aluno_professor.html')
-
+    return render(request, 'cadastro_app/escolha_perfil.html')  # Atualizado para 'escolha_perfil'
 
 def inicio_aluno(request):
     return render(request, 'cadastro_app/inicio_aluno.html')
@@ -16,91 +23,43 @@ def inicio_aluno(request):
 def inicio_professor(request):
     return render(request, 'cadastro_app/inicio_professor.html')
 
+# Removido a função inicio_instituicao
 
 @login_required
 def home(request):
     resumo_lido = request.session.get('resumo_lido', False)
     return render(request, 'cadastro_app/home.html', {'resumo_lido': resumo_lido})
 
-
-
 def cadastrar_aluno(request):
     if request.method == 'POST':
-        form = UsuarioPersonalizadoCreationForm(request.POST)
+        form = AlunoRegistrationForm(request.POST)
         if form.is_valid():
             form.save()
-            messages.success(request, 'Aluno cadastrado com sucesso!')
+            messages.success(request, 'Aluno cadastrado com sucesso! Por favor, faça o login.')
             return redirect('login_aluno')
         else:
-            messages.error(
-                request, 'Houve um erro no cadastro. Verifique as informações.')
+            messages.error(request, 'Houve um erro no cadastro. Verifique as informações.')
     else:
-        form = UsuarioPersonalizadoCreationForm()
+        form = AlunoRegistrationForm()
     return render(request, 'cadastro_app/cadastrar_aluno.html', {'form': form})
-
-
-
 
 def cadastrar_professor(request):
     if request.method == 'POST':
-        usuario_form = UsuarioPersonalizadoCreationForm(request.POST)
-        professor_form = ProfessorForm(request.POST)
-        if usuario_form.is_valid() and professor_form.is_valid():
-            usuario = usuario_form.save(commit=False)
-            usuario.is_active = False  
-            usuario.save()
-            Professor.objects.create(
-                usuario=usuario,
-                departamento=professor_form.cleaned_data['departamento']
-            )
-            messages.success(
-                request, 'Professor cadastrado com sucesso! Por favor, faça o login.')
+        form = ProfessorRegistrationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Professor cadastrado com sucesso! Por favor, faça o login.')
             return redirect('login_professor')
         else:
-            messages.error(
-                request, 'Houve um erro no cadastro. Verifique as informações.')
+            messages.error(request, 'Houve um erro no cadastro. Verifique as informações.')
     else:
-        usuario_form = UsuarioPersonalizadoCreationForm()
-        professor_form = ProfessorForm()
-    return render(request, 'cadastro_app/cadastrar_professor.html', {
-        'usuario_form': usuario_form,
-        'professor_form': professor_form
-    })
+        form = ProfessorRegistrationForm()
+    return render(request, 'cadastro_app/cadastrar_professor.html', {'form': form})
 
-
-
-
-def cadastrar_instituicao(request):
-    if request.method == 'POST':
-        usuario_form = UsuarioPersonalizadoCreationForm(request.POST)
-        instituicao_form = InstituicaoForm(request.POST)
-        if usuario_form.is_valid() and instituicao_form.is_valid():
-            usuario = usuario_form.save(commit=False)
-            usuario.is_active = False  
-            usuario.save()
-            Instituicao.objects.create(
-                usuario=usuario,
-                cnpj=instituicao_form.cleaned_data['cnpj']
-            )
-            messages.success(
-                request, 'Instituição cadastrada com sucesso! Por favor, faça o login.')
-            return redirect('login_instituicao')
-        else:
-            messages.error(
-                request, 'Houve um erro no cadastro. Verifique as informações.')
-    else:
-        usuario_form = UsuarioPersonalizadoCreationForm()
-        instituicao_form = InstituicaoForm()
-    return render(request, 'cadastro_app/cadastrar_instituicao.html', {
-        'usuario_form': usuario_form,
-        'instituicao_form': instituicao_form
-    })
-
-
+# Removido completamente a função cadastrar_instituicao
 
 def resumo_pbl(request):
     return render(request, 'cadastro_app/resumo_pbl.html')
-
 
 def confirmar_leitura(request):
     if request.method == 'POST':
@@ -109,17 +68,13 @@ def confirmar_leitura(request):
         return JsonResponse({'success': True})
     return JsonResponse({'success': False}, status=400)
 
-
 @login_required
 def teste_pbl(request):
     if not request.session.get('resumo_lido', False):
         return HttpResponseForbidden("Você precisa ler o resumo antes de fazer o teste.")
     return render(request, 'cadastro_app/teste_pbl.html')
 
-
-
 def teste_pbl_questao(request, questao_num):
-    # Lista de questões para o questionário
     questoes = [
         {
             'pergunta': "PROBLEMA(S) DO CLIENTE COMO PROPOSTA EDUCACIONAL",
@@ -212,10 +167,8 @@ def teste_pbl_questao(request, questao_num):
             ]
         }
     ]
-
     total_questoes = len(questoes)
 
-    
     if questao_num > total_questoes:
         return redirect('resultado_teste')
 
@@ -225,14 +178,16 @@ def teste_pbl_questao(request, questao_num):
         questao = questoes[questao_num - 1]
         texto = questao['pergunta']
         ordem = questao_num
+        curso = request.user.aluno.curso  # Obtém o curso do aluno
 
         Resposta.objects.update_or_create(
-            usuario=request.user,
+            aluno=request.user.aluno,  # Referência correta ao Aluno
             questao_num=questao_num,
             defaults={
                 'resposta': resposta,
                 'texto': texto,
                 'ordem': ordem,
+                'curso': curso,  # Inclui o campo curso
             }
         )
 
@@ -245,7 +200,7 @@ def teste_pbl_questao(request, questao_num):
 
     try:
         resposta_usuario = Resposta.objects.get(
-            usuario=request.user, questao_num=questao_num)
+            aluno=request.user.aluno, questao_num=questao_num)
         resposta_selecionada = resposta_usuario.resposta
     except Resposta.DoesNotExist:
         resposta_selecionada = None
@@ -258,11 +213,10 @@ def teste_pbl_questao(request, questao_num):
     }
     return render(request, 'cadastro_app/teste_pbl_questao.html', context)
 
-
 @login_required
 def resultado_teste(request):
     respostas_usuario = Resposta.objects.filter(
-        usuario=request.user).order_by('questao_num')
+        aluno=request.user.aluno).order_by('questao_num')
 
     if not respostas_usuario.exists():
         return redirect('teste_pbl_questao', questao_num=1)
@@ -283,6 +237,61 @@ def resultado_teste(request):
 
     return render(request, 'cadastro_app/resultado_teste.html', context)
 
-
 def escolha_perfil(request):
     return render(request, 'cadastro_app/aluno_professor.html')
+
+# Adicionando as Views de Login
+
+User = get_user_model()
+
+def login_aluno(request):
+    if request.method == 'POST':
+        form = AuthenticationForm(request, data=request.POST)
+        if form.is_valid():
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
+            user = authenticate(request, username=username, password=password)
+            if user is not None:
+                try:
+                    # Verifica se o usuário é um aluno
+                    if hasattr(user, 'aluno'):
+                        login(request, user)
+                        return redirect('home')  # Redireciona para a tela 'home' após o login do aluno
+                    else:
+                        messages.error(request, 'Você não está cadastrado como Aluno.')
+                except Aluno.DoesNotExist:
+                    messages.error(request, 'Você não está cadastrado como Aluno.')
+            else:
+                messages.error(request, 'Usuário ou senha inválidos.')
+        else:
+            messages.error(request, 'Informações inválidas. Verifique e tente novamente.')
+    else:
+        form = AuthenticationForm()
+    
+    return render(request, 'cadastro_app/login_aluno.html', {'form': form})
+
+def login_professor(request):
+    if request.method == 'POST':
+        form = AuthenticationForm(request, data=request.POST)
+        if form.is_valid():
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
+            user = authenticate(request, username=username, password=password)
+            if user is not None:
+                try:
+                    # Verifica se o usuário é um professor
+                    if hasattr(user, 'professor'):
+                        login(request, user)
+                        return redirect('inicio_professor')  # Redireciona para a tela de professor
+                    else:
+                        messages.error(request, 'Você não está cadastrado como Professor.')
+                except Professor.DoesNotExist:
+                    messages.error(request, 'Você não está cadastrado como Professor.')
+            else:
+                messages.error(request, 'Usuário ou senha inválidos.')
+        else:
+            messages.error(request, 'Informações inválidas. Verifique e tente novamente.')
+    else:
+        form = AuthenticationForm()
+    
+    return render(request, 'cadastro_app/login_professor.html', {'form': form})

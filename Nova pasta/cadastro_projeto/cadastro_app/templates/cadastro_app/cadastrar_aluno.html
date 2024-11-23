@@ -12,10 +12,16 @@
         .container {
             max-width: 600px;
             margin-top: 50px;
+            padding: 30px;
+            background-color: #ffffff;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
         }
         h1 {
             text-align: center;
             margin-bottom: 30px;
+            font-weight: bold; /* Mantendo o título em negrito */
+            color: #343a40;
         }
         h3 {
             margin-top: 30px;
@@ -24,25 +30,31 @@
             padding-bottom: 10px;
         }
         .btn-container {
-            margin-top: 20px;
+            margin-top: 30px;
+            display: flex;
+            justify-content: space-between;
         }
         .btn {
-            width: 100%;
+            width: 48%;
         }
         .form-group {
-            margin-bottom: 15px;
+            margin-bottom: 25px;
         }
         label {
             font-weight: 500;
+            margin-bottom: 5px;
+            display: block;
         }
         .form-control {
             border-radius: 5px;
+            border: 1px solid #ced4da;
         }
     </style>
 </head>
 <body>
-    <div class="container bg-white p-4 shadow-sm rounded">
-        <h1>Cadastro de Aluno</h1>
+    <a href="/" class="btn btn-link" style="position: fixed; top: 20px; left: 20px; color: #007bff; text-decoration: none;">&larr; Voltar ao Menu Principal</a>
+    <div class="container bg-white p-4 shadow-sm rounded" style="margin-top: 70px;">
+        <h1 class="font-weight-bold">Cadastro de Aluno</h1> <!-- Título em negrito -->
         {% if messages %}
             {% for message in messages %}
                 <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}" role="alert">
@@ -50,50 +62,73 @@
                 </div>
             {% endfor %}
         {% endif %}
-        <form method="post">
+        <form method="post" action="{% url 'cadastrar_aluno' %}">
             {% csrf_token %}
             <h3>Informações do Usuário</h3>
             
-            <div class="form-row">
-                <div class="form-group col-md-6">
-                    {{ form.username.label_tag }}
-                    {{ form.username }}
-                </div>
-                <div class="form-group col-md-6">
-                    {{ form.email.label_tag }}
-                    {{ form.email }}
-                </div>
+            <div class="form-group">
+                <label for="id_username">Usuário:</label>
+                {{ form.username }}
+                {% for error in form.username.errors %}
+                    <small class="form-text text-danger">{{ error }}</small>
+                {% endfor %}
             </div>
             
             <div class="form-group">
-                {{ form.nome_completo.label_tag }}
+                <label for="id_email">Email:</label>
+                {{ form.email }}
+                {% for error in form.email.errors %}
+                    <small class="form-text text-danger">{{ error }}</small>
+                {% endfor %}
+            </div>
+            
+            <div class="form-group">
+                <label for="id_nome_completo">Nome Completo:</label>
                 {{ form.nome_completo }}
+                {% for error in form.nome_completo.errors %}
+                    <small class="form-text text-danger">{{ error }}</small>
+                {% endfor %}
             </div>
             
             <div class="form-group">
-                {{ form.curso.label_tag }}
+                <label for="id_curso">Curso:</label>
                 {{ form.curso }}
+                {% for error in form.curso.errors %}
+                    <small class="form-text text-danger">{{ error }}</small>
+                {% endfor %}
             </div>
             
+            <h3>Informações de Senha</h3>
+            
             <div class="form-group">
-                {{ form.password1.label_tag }}
+                <label for="id_password1">Senha:</label>
                 {{ form.password1 }}
+                {% for error in form.password1.errors %}
+                    <small class="form-text text-danger">{{ error }}</small>
+                {% endfor %}
             </div>
             
             <div class="form-group">
-                {{ form.password2.label_tag }}
+                <label for="id_password2">Confirmação de senha:</label>
                 {{ form.password2 }}
+                {% for error in form.password2.errors %}
+                    <small class="form-text text-danger">{{ error }}</small>
+                {% endfor %}
             </div>
             
-            <div class="form-row btn-container">
-                <div class="col-md-6">
-                    <a href="/" class="btn btn-secondary">Voltar</a>
-                </div>
-                <div class="col-md-6">
-                    <button type="submit" class="btn btn-success">Cadastrar</button>
-                </div>
+            <div class="btn-container">
+                <a href="/" class="btn btn-secondary">Voltar</a>
+                <button type="submit" class="btn btn-success">Cadastrar</button>
             </div>
         </form>
     </div>
+
+    <!-- Bootstrap JS e Dependências -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+        integrity="sha384-DfXdHjhVgVMbU6G4R/mvdvFouFChso1emrHZLa5FD+2DFxT6/Y0kS/hs/Ln8q3Q"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-LtrjvnR4GearyBQuuC/WgFhjJGB9ihUXExs+Y0MOMBAmNIP37aAeJaPOt2VBBsKk"
+        crossorigin="anonymous"></script>
 </body>
 </html>
