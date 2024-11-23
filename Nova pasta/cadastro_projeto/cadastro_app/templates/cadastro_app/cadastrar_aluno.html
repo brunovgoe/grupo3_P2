@@ -1,19 +1,99 @@
-<!-- cadastro_app/templates/cadastro_app/cadastrar_aluno.html -->
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Cadastrar Aluno</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Aluno</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .container {
+            max-width: 600px;
+            margin-top: 50px;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        h3 {
+            margin-top: 30px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #dee2e6;
+            padding-bottom: 10px;
+        }
+        .btn-container {
+            margin-top: 20px;
+        }
+        .btn {
+            width: 100%;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            font-weight: 500;
+        }
+        .form-control {
+            border-radius: 5px;
+        }
+    </style>
 </head>
 <body>
-    <h1>Cadastro de Aluno</h1>
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Cadastrar</button>
-    </form>
-    <br>
-    <a href="{% url 'cadastrar_professor' %}">Cadastrar Professor</a> | 
-    <a href="{% url 'cadastrar_instituicao' %}">Cadastrar Instituição</a>
+    <div class="container bg-white p-4 shadow-sm rounded">
+        <h1>Cadastro de Aluno</h1>
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}" role="alert">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+        <form method="post">
+            {% csrf_token %}
+            <h3>Informações do Usuário</h3>
+            
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    {{ form.username.label_tag }}
+                    {{ form.username }}
+                </div>
+                <div class="form-group col-md-6">
+                    {{ form.email.label_tag }}
+                    {{ form.email }}
+                </div>
+            </div>
+            
+            <div class="form-group">
+                {{ form.nome_completo.label_tag }}
+                {{ form.nome_completo }}
+            </div>
+            
+            <div class="form-group">
+                {{ form.curso.label_tag }}
+                {{ form.curso }}
+            </div>
+            
+            <div class="form-group">
+                {{ form.password1.label_tag }}
+                {{ form.password1 }}
+            </div>
+            
+            <div class="form-group">
+                {{ form.password2.label_tag }}
+                {{ form.password2 }}
+            </div>
+            
+            <div class="form-row btn-container">
+                <div class="col-md-6">
+                    <a href="/" class="btn btn-secondary">Voltar</a>
+                </div>
+                <div class="col-md-6">
+                    <button type="submit" class="btn btn-success">Cadastrar</button>
+                </div>
+            </div>
+        </form>
+    </div>
 </body>
 </html>
