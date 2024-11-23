@@ -21,7 +21,7 @@ def inicio_aluno(request):
     return render(request, 'cadastro_app/inicio_aluno.html')
 
 def inicio_professor(request):
-    return render(request, 'cadastro_app/inicio_professor.html')
+    return render(request, 'cadastro_app/pagina_inicial_professor.html')
 
 # Removido a função inicio_instituicao
 
@@ -274,21 +274,15 @@ def login_professor(request):
     if request.method == 'POST':
         form = AuthenticationForm(request, data=request.POST)
         if form.is_valid():
-            username = form.cleaned_data.get('username')
+            email = form.cleaned_data.get('username')  # Use 'username' aqui, pois o campo do formulário padrão usa 'username' para o e-mail
             password = form.cleaned_data.get('password')
-            user = authenticate(request, username=username, password=password)
-            if user is not None:
-                try:
-                    # Verifica se o usuário é um professor
-                    if hasattr(user, 'professor'):
-                        login(request, user)
-                        return redirect('inicio_professor')  # Redireciona para a tela de professor
-                    else:
-                        messages.error(request, 'Você não está cadastrado como Professor.')
-                except Professor.DoesNotExist:
-                    messages.error(request, 'Você não está cadastrado como Professor.')
+            user = authenticate(request, username=email, password=password)
+            
+            if user is not None and hasattr(user, 'professor'):
+                login(request, user)
+                return redirect('pagina_inicial_professor')  # Redireciona para a página inicial do professor
             else:
-                messages.error(request, 'Usuário ou senha inválidos.')
+                messages.error(request, 'Usuário ou senha inválidos ou você não está registrado como professor.')
         else:
             messages.error(request, 'Informações inválidas. Verifique e tente novamente.')
     else:

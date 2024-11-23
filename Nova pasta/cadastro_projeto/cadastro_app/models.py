@@ -27,7 +27,7 @@ class Aluno(models.Model):
         return self.usuario.nome_completo
 
 class Professor(models.Model):
-    usuario = models.OneToOneField(UsuarioPersonalizado, on_delete=models.CASCADE)
+    usuario = models.OneToOneField(UsuarioPersonalizado, on_delete=models.CASCADE, related_name='professor')
     cursos = models.ManyToManyField(Curso)  # Relação Many-to-Many com Curso
 
     def __str__(self):

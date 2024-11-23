@@ -6,7 +6,7 @@ from . import views
 urlpatterns = [
     path('', views.escolha_perfil, name='pagina_inicial'),  # Página inicial (Escolha de Perfil)
     path('home/', views.home, name='home'),  # Página inicial do aluno após login
-    path('inicio_professor/', views.inicio_professor, name='inicio_professor'),  # Página inicial do professor
+    path('pagina_inicial_professor/', views.inicio_professor, name='pagina_inicial_professor'),
     path('cadastrar_aluno/', views.cadastrar_aluno, name='cadastrar_aluno'),
     path('cadastrar_professor/', views.cadastrar_professor, name='cadastrar_professor'),
     path('login_aluno/', views.login_aluno, name='login_aluno'),
