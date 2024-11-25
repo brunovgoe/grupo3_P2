@@ -65,8 +65,8 @@
     <div class="container">
         <h1>Bem-vindo, Professor</h1>
         <p>Escolha uma das opções abaixo:</p>
-        <a href="projeto-2-si-equipe-3/Nova pasta/cadastro_projeto/cadastro_app/templates/cadastro_app/resultados_por_turma.html" class="button button-blue">Visualizar Resultados por Pergunta</a>
-        <a href="projeto-2-si-equipe-3/Nova pasta/cadastro_projeto/cadastro_app/templates/cadastro_app/resultados_por_turma.html" class="button button-green">Visualizar Resultados por Curso</a>
+        <a href="{% url 'resultados_por_pergunta' %}" class="button button-blue">Visualizar Resultados por Pergunta</a>
+        <a href="{% url 'resultados_por_curso' %}" class="button button-green">Visualizar Resultados por Curso</a>
     </div>
 </body>
 </html>

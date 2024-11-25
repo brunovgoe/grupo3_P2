@@ -23,7 +23,11 @@ def inicio_aluno(request):
 def inicio_professor(request):
     return render(request, 'cadastro_app/pagina_inicial_professor.html')
 
-# Removido a função inicio_instituicao
+def resultados_por_curso(request):
+    return render(request, 'cadastro_app/resultados_por_curso.html')
+
+def resultados_por_pergunta(request):
+    return render(request, 'cadastro_app/resultados_por_pergunta.html')
 
 @login_required
 def home(request):
