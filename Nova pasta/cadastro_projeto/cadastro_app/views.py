@@ -25,11 +25,141 @@ def inicio_professor(request):
     return render(request, 'cadastro_app/pagina_inicial_professor.html')
 
 def resultados_por_curso(request):
-    resultados = Resposta.objects.values('curso__nome').annotate(total_respostas=Count('id'))
+    # Obtendo todos os cursos disponíveis
+    cursos = Curso.objects.all()
+    selected_curso = request.GET.get('curso', None)
 
-    return render(request, 'cadastro_app/resultados_por_curso.html', {
-        'resultados': resultados
-    })
+    resultados = []
+
+    # Obtendo todas as perguntas das questões e preparando um dicionário para armazenar os dados
+    questoes = [
+        {
+            'pergunta': "PROBLEMA(S) DO CLIENTE COMO PROPOSTA EDUCACIONAL",
+            'opcoes': [
+                "As atividades de aprendizagem (conteúdo, práticas, exercícios) são ministradas independentemente do problema.",
+                "Todas as atividades são iniciadas, motivadas e direcionadas para a resolução de uma tarefa ou problema específico, sendo este o propósito maior de aprendizagem.",
+                "Nem todas as atividades estão associadas com a resolução de tarefas ou problemas específicos. Por exemplo, o conteúdo é explanado sem relação com a prática.",
+                "Não sei informar."
+            ]
+        },
+        {
+            'pergunta': "O ALUNO SENTE-SE RESPONSÁVEL PELA RESOLUÇÃO DO PROBLEMA",
+            'opcoes': [
+                "Postura totalmente passiva com relação ao problema.",
+                "O aluno se envolve com o problema para cumprir metas, geralmente na entrega de resultados parciais exigidos pelo professor ou tutor.",
+                "O aluno está totalmente envolvido com o problema, demonstrando engajamento na busca pela sua solução, independente de tarefas exigidas pelo professor ou tutor.",
+                "Não sei informar."
+            ]
+        },
+        {
+            'pergunta': "AUTENTICIDADE DO PROBLEMA OU TAREFA",
+            'opcoes': [
+                "As tarefas de aprendizagem não refletem as situações do mundo real.",
+                "As tarefas de aprendizagem são reais, definidas e acompanhadas a partir de clientes reais, em contexto real controlado por escopo da solução, prazos de entrega e esforço despendido.",
+                "Problema ou tarefa real, mas sem a participação do cliente ou ainda definição do contexto realizada pelo professor.",
+                "Não sei informar."
+            ]
+        },
+        {
+            'pergunta': "AUTENTICIDADE DO AMBIENTE DE APRENDIZAGEM",
+            'opcoes': [
+                "O ambiente de aprendizado é convencional, tanto o físico (mobília e recursos) quanto os procedimentos.",
+                "O ambiente de aprendizado é real, com os mesmos desafios que você encontrará no ambiente de trabalho para o qual está sendo treinado: equipe, infraestrutura e processos reais.",
+                "O ambiente de aprendizado é uma simulação do mundo real.",
+                "Não sei informar."
+            ]
+        },
+        {
+            'pergunta': "CONDUÇÃO DO PROCESSO DE RESOLUÇÃO DO PROBLEMA",
+            'opcoes': [
+                "O processo de resolução do problema é totalmente conduzido pelo professor ou tutor, sem entendimento por parte do aluno.",
+                "O professor ou tutor define o processo de resolução do problema, mas o aluno o entende, sabe aplicá-lo e é capaz de identificar pontos fortes e de melhoria.",
+                "O aluno define o processo de resolução de problema, descrevendo suas etapas, pontos fortes e de melhoria.",
+                "Não sei informar."
+            ]
+        },
+        {
+            'pergunta': "COMPLEXIDADE DO PROBLEMA OU TAREFA",
+            'opcoes': [
+                "Os problemas ou tarefas são simples de resolver, exigindo pouco do assunto abordado na disciplina.",
+                "A complexidade dos problemas ou tarefas é moderada, por não exigir muito esforço do aluno na busca de informações ou soluções alternativas para sua resolução.",
+                "A complexidade do problema ou tarefa estimula o raciocínio e o desafio no desenvolvimento das ideias acerca do problema proposto. São necessárias mais informações que as fornecidas para entender o problema e conhecer as ações necessárias para a sua solução.",
+                "Não sei informar."
+            ]
+        },
+        {
+            'pergunta': "AVALIAÇÃO E ANÁLISE DA SOLUÇÃO PARA O PROBLEMA",
+            'opcoes': [
+                "A solução para o problema é proposta por um dos membros da equipe, a partir de seu conhecimento e/ou experiência individual.",
+                "Soluções são propostas por um ou mais alunos e, a partir da discussão entre os membros do grupo, decide-se pela melhor solução.",
+                "As soluções são construídas a partir de um processo investigativo e questionador de ideias entre os membros da equipe, que buscam novas fontes e contextos alternativos para desenvolver a melhor solução para o problema.",
+                "Não sei informar."
+            ]
+        },
+        {
+            'pergunta': "REFLEXÃO SOBRE COMO O ALUNO APRENDEU O CONTEÚDO NO PROCESSO DE APRENDIZAGEM",
+            'opcoes': [
+                "O aluno não tem oportunidade para refletir sobre sua aprendizagem.",
+                "O aluno tem oportunidade para refletir sobre sua aprendizagem, mas não é orientado para o desenvolvimento de habilidades de autorreflexão sobre o processo de construção do conhecimento. Por exemplo, não é orientado a identificar e descrever como aprendeu, o que aprendeu e o que precisa aprender.",
+                "O aluno tem oportunidade de pensar e agir reflexivamente, demonstrando habilidades de autorreflexão, descrevendo como aprendeu, o que aprendeu e o que precisa aprender. Do aluno é exigido que descreva as etapas de resolução do problema e o planejamento do processo de resolução.",
+                "Não sei informar."
+            ]
+        },
+        {
+            'pergunta': "FORMA DE APRENDIZAGEM",
+            'opcoes': [
+                "A aprendizagem ocorre em grupos, mas há pouca colaboração e interatividade (participação) com os colegas do grupo, também como para os professores e tutores.",
+                "A aprendizagem é colaborativa e acontece através de várias direções entre (professor - aluno, aluno - professor, aluno - aluno), envolvendo discussões, diálogos em grupo e maior interação com os colegas, professores e tutores.",
+                "A aprendizagem acontece através apenas da interação entre (professor - aluno), com informações repassadas por um professor ou tutor.",
+                "Não sei informar."
+            ]
+        },
+        {
+            'pergunta': "AVALIAÇÃO E ACOMPANHAMENTO CONTÍNUO",
+            'opcoes': [
+                "As avaliações não estão alinhadas com os objetivos educacionais propostos no planejamento do ensino.",
+                "As avaliações são contínuas e alinhadas aos objetivos educacionais planejados. Elas são aplicadas com o propósito de monitorar o progresso do aprendizado (verificar se os objetivos foram alcançados), prover feedback para o aluno, daquilo que ele aprendeu e do que precisa aprender, identificando as falhas da aprendizagem e os aspectos da instrução que precisam ser modificados.",
+                "Os objetivos educacionais não foram claramente definidos e as avaliações são aplicadas com um único propósito: atribuição de uma nota/conceito como forma de “classificar” o conhecimento do aluno como aprovado ou reprovado.",
+                "Não sei informar."
+            ]
+        }
+    ]
+
+    for questao in questoes:
+        texto_pergunta = questao['pergunta']
+        opcoes = questao['opcoes']
+
+        # Inicializa as respostas com todas as opções possíveis, todas começando com 0
+        contagem_respostas = defaultdict(int)
+        for opcao in opcoes:
+            contagem_respostas[opcao] = 0
+
+        # Filtra respostas por curso e pergunta
+        if selected_curso:
+            respostas = Resposta.objects.filter(curso_id=selected_curso, texto=texto_pergunta).values('resposta').annotate(total=Count('resposta'))
+        else:
+            respostas = Resposta.objects.filter(texto=texto_pergunta).values('resposta').annotate(total=Count('resposta'))
+
+        # Atualiza as contagens das respostas com os dados do banco
+        for resposta in respostas:
+            contagem_respostas[resposta['resposta']] = resposta['total']
+
+        # Cria uma lista de respostas com as contagens atualizadas
+        respostas_contagem = [{'resposta': opcao, 'total': contagem_respostas[opcao]} for opcao in opcoes]
+
+        # Adiciona os dados ao resultado
+        resultados.append({
+            'pergunta': texto_pergunta,
+            'respostas': respostas_contagem
+        })
+
+    context = {
+        'cursos': cursos,
+        'selected_curso': int(selected_curso) if selected_curso else None,
+        'resultados': resultados,
+    }
+
+    return render(request, 'cadastro_app/resultados_por_curso.html', context)
 
 def resultados_por_pergunta(request):
     # Lista de questões e suas respectivas respostas
